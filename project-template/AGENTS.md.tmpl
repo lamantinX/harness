@@ -13,7 +13,7 @@ This is the project-level cross-agent contract.
 2. Load the smallest relevant context.
 3. Make the smallest safe change.
 4. Run targeted verification.
-5. Log meaningful runs.
+5. Log every required run before the final response.
 
 ## Task classes
 
@@ -46,4 +46,6 @@ Do not touch secrets, environment files, production data, destructive operations
 
 Read project rules under `.claude/rules/` when relevant.
 Use `docs/harness/README.md` for project harness details.
-Log meaningful runs under `docs/ai-runs/`.
+Log every Standard, Complex, Core-risk, Research-only, and Meta-harness task under `docs/ai-runs/`.
+Trivial tasks may be skipped only when they create no durable change and expose no workflow issue.
+Update `docs/ai-runs/harness-scores.md` after every five required logs and after any failed, rolled-back, security-sensitive, or high-friction run.

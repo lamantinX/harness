@@ -9,7 +9,7 @@ The kit has two layers:
 
 Use this kit as a dispatcher and template generator. Do not copy one project's rules into every other project.
 
-Harness-Kit-Version: 0.1.0
+Harness-Kit-Version: 0.2.0
 
 ## Quick start
 
@@ -46,9 +46,21 @@ ai-agent --dry-run claude "plan a complex refactor"
 - `aih install` — install/sync kit files into `~/.ai-harness`.
 - `aih init-project [--dry-run]` — create a generic project harness overlay.
 - `aih sync-project [--dry-run]` — compare current project overlay with the kit template.
-- `aih log "task"` — append a run-log entry.
+- `aih log "task"` — append a required run-log entry.
+- `aih score "sample"` — append a completed harness score entry.
+- `aih score --draft "sample"` — append an explicitly incomplete score draft.
 - `aih version` — print kit version.
 - `ai-agent <agent> "task"` — inject global + project protocol into the selected agent.
+
+## Run-log discipline
+
+Log every Standard, Complex, Core-risk, Research-only, and Meta-harness task before the final response. Trivial tasks may be skipped only when they produce no durable change and reveal no workflow problem.
+
+Every required entry records task class, risk, inspected and changed file counts, checks, result, failure or remaining risk, and one harness note. A run is not complete until its log exists.
+
+`aih log` defaults to `unverified` and refuses a `pass` result when checks are not supplied through `AIH_CHECKS`.
+
+Append a score entry after every five required run logs and immediately after any failed, rolled-back, security-sensitive, or high-friction run.
 
 ## Core principle
 

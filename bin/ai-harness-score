@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DRAFT=0
+if [[ "${1:-}" == "--draft" ]]; then
+  DRAFT=1
+  shift
+fi
+
+SAMPLE="${*:-manual sample}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+PROJECT="$(basename "$ROOT")"
+DATE="$(date +%Y-%m-%d)"
+LOG_DIR="$ROOT/docs/ai-runs"
+SCORE_FILE="$LOG_DIR/harness-scores.md"
+DIMENSIONS=(CORRECTNESS CONTEXT DIFF SAFETY VERIFICATION SPEED FRICTION)
+
+if [[ "$DRAFT" != "1" ]]; then
+  for dimension in "${DIMENSIONS[@]}"; do
+    score_var="AIH_SCORE_$dimension"
+    evidence_var="AIH_EVIDENCE_$dimension"
+    score="${!score_var:-}"
+    evidence="${!evidence_var:-}"
+    if [[ ! "$score" =~ ^[1-5]$ || -z "$evidence" ]]; then
+      echo "Incomplete score: set $score_var to 1-5 and provide $evidence_var, or use --draft." >&2
+      exit 2
+    fi
+  done
+fi
+
+if [[ ! -d "$LOG_DIR" ]]; then
+  LOG_DIR="${AI_HARNESS_HOME:-$HOME/.ai-harness}/logs"
+  mkdir -p "$LOG_DIR"
+  SCORE_FILE="$LOG_DIR/$PROJECT-scores.md"
+fi
+
+if [[ ! -f "$SCORE_FILE" ]]; then
+  cat > "$SCORE_FILE" <<'EOF'
+# Harness Score Log
+
+Score each dimension from 1 (poor) to 5 (excellent). Add evidence, not impressions.
+EOF
+fi
+
+cat >> "$SCORE_FILE" <<EOF
+
+## $DATE - $SAMPLE
+
+- Harness version: ${AIH_HARNESS_VERSION:-0.2.0}
+- Run-log sample: ${AIH_RUN_SAMPLE:-not recorded}
+- Trigger: ${AIH_SCORE_TRIGGER:-manual}
+
+| Dimension | Score 1-5 | Evidence |
+|---|---:|---|
+| Correctness | ${AIH_SCORE_CORRECTNESS:-} | ${AIH_EVIDENCE_CORRECTNESS:-} |
+| Context efficiency | ${AIH_SCORE_CONTEXT:-} | ${AIH_EVIDENCE_CONTEXT:-} |
+| Diff minimality | ${AIH_SCORE_DIFF:-} | ${AIH_EVIDENCE_DIFF:-} |
+| Safety | ${AIH_SCORE_SAFETY:-} | ${AIH_EVIDENCE_SAFETY:-} |
+| Verification quality | ${AIH_SCORE_VERIFICATION:-} | ${AIH_EVIDENCE_VERIFICATION:-} |
+| Speed | ${AIH_SCORE_SPEED:-} | ${AIH_EVIDENCE_SPEED:-} |
+| User friction | ${AIH_SCORE_FRICTION:-} | ${AIH_EVIDENCE_FRICTION:-} |
+
+### Keep
+
+### Change
+
+### One Next Improvement
+EOF
+
+if [[ "$DRAFT" == "1" ]]; then
+  echo "Incomplete score draft added to $SCORE_FILE"
+else
+  echo "Completed score entry added to $SCORE_FILE"
+fi

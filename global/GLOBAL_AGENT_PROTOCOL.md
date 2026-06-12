@@ -1,6 +1,6 @@
 # Global Agent Protocol
 
-Harness-Kit-Version: 0.1.0
+Harness-Kit-Version: 0.2.0
 
 This protocol is the universal startup contract for AI coding agents.
 
@@ -84,3 +84,14 @@ For every completed non-trivial task, report:
 - result;
 - remaining risks;
 - where the run log was recorded.
+
+## Completion gate
+
+Before the final response:
+
+1. Run the required verification.
+2. Write the required run log.
+3. Confirm the log includes result and remaining risk or failure.
+4. Add a harness score when the scoring trigger is met.
+
+A required run is incomplete if its log was omitted.

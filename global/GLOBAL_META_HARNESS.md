@@ -4,7 +4,7 @@ Goal: improve agent workflows using evidence from real runs.
 
 Do not optimize based on vibes.
 
-## Track for meaningful runs
+## Track for required runs
 
 - date
 - project
@@ -37,12 +37,23 @@ Do not optimize based on vibes.
 
 - If the project has `docs/ai-runs/`, log there.
 - Otherwise log to `~/.ai-harness/logs/<project>.md`.
+- Log every Standard, Complex, Core-risk, Research-only, and Meta-harness task.
+- Write the entry after verification and before the final response.
+- Include the actual result, failed checks, and remaining risks. Never record an unverified pass.
+- Trivial tasks may be skipped only when they create no durable change and expose no workflow issue.
 
-Do not log noisy trivial tasks unless they reveal a workflow problem.
+## Score log
+
+- Keep the cumulative score log at `docs/ai-runs/harness-scores.md`, or `~/.ai-harness/logs/<project>-scores.md` when no project log directory exists.
+- Add one score entry after every five required run logs.
+- Add one immediately after a failed, rolled-back, security-sensitive, or high-friction run.
+- Score from evidence in the sampled run logs. Empty evidence means the score is not complete.
+- Treat `aih score --draft` output as incomplete until every dimension has a 1-5 score and evidence.
+- Select exactly one next improvement. Do not create a broad rewrite list.
 
 ## Improvement loop
 
-After 5–10 meaningful runs:
+After each five-run sample:
 
 1. Read run logs.
 2. Identify repeated waste, failure, or friction.

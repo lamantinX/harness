@@ -5,7 +5,25 @@ TASK="${*:-manual task}"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 PROJECT="$(basename "$ROOT")"
 DATE="$(date +%Y-%m-%d)"
+TIME="$(date +%H:%M:%S)"
 LOG_DIR="$ROOT/docs/ai-runs"
+AGENT="${AIH_AGENT:-manual}"
+MODEL="${AIH_MODEL:-n/a}"
+CLASS="${AIH_CLASS:-standard}"
+RISK="${AIH_RISK:-low}"
+PLAN="${AIH_PLAN_USED:-no}"
+APPROVAL="${AIH_APPROVAL:-n/a}"
+INSPECTED="${AIH_FILES_INSPECTED:-0}"
+CHANGED="${AIH_FILES_CHANGED:-0}"
+CHECKS="${AIH_CHECKS:-not recorded}"
+RESULT="${AIH_RESULT:-unverified}"
+FAILURE_RISK="${AIH_FAILURE_RISK:-none}"
+HARNESS_NOTE="${AIH_HARNESS_NOTE:-none}"
+
+if [[ "$RESULT" == "pass" && "$CHECKS" == "not recorded" ]]; then
+  echo "Refusing to record pass without AIH_CHECKS." >&2
+  exit 2
+fi
 
 if [[ ! -d "$LOG_DIR" ]]; then
   LOG_DIR="${AI_HARNESS_HOME:-$HOME/.ai-harness}/logs"
@@ -18,10 +36,10 @@ fi
 
 if [[ ! -f "$LOG_FILE" ]]; then
   cat > "$LOG_FILE" <<'EOF'
-| Date | Project | Agent | Model | Task | Class | Risk | Plan Used | Approval | Files Inspected | Files Changed | Checks | Result | Context Notes | Harness Note |
-|---|---|---|---|---|---|---|---|---|---:|---:|---|---|---|---|
+| Date | Time | Project | Agent | Model | Task | Class | Risk | Plan Used | Approval | Files Inspected | Files Changed | Checks | Result | Failure / Remaining Risk | Harness Note |
+|---|---|---|---|---|---|---|---|---|---|---:|---:|---|---|---|---|
 EOF
 fi
 
-echo "| $DATE | $PROJECT | manual | n/a | $TASK | unknown | unknown | unknown | unknown | 0 | 0 | n/a | recorded | n/a | n/a |" >> "$LOG_FILE"
+echo "| $DATE | $TIME | $PROJECT | $AGENT | $MODEL | $TASK | $CLASS | $RISK | $PLAN | $APPROVAL | $INSPECTED | $CHANGED | $CHECKS | $RESULT | $FAILURE_RISK | $HARNESS_NOTE |" >> "$LOG_FILE"
 echo "Logged to $LOG_FILE"
