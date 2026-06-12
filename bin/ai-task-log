@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TASK="${*:-manual task}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+PROJECT="$(basename "$ROOT")"
+DATE="$(date +%Y-%m-%d)"
+LOG_DIR="$ROOT/docs/ai-runs"
+
+if [[ ! -d "$LOG_DIR" ]]; then
+  LOG_DIR="${AI_HARNESS_HOME:-$HOME/.ai-harness}/logs"
+  mkdir -p "$LOG_DIR"
+  LOG_FILE="$LOG_DIR/$PROJECT.md"
+else
+  mkdir -p "$LOG_DIR"
+  LOG_FILE="$LOG_DIR/${DATE:0:7}.md"
+fi
+
+if [[ ! -f "$LOG_FILE" ]]; then
+  cat > "$LOG_FILE" <<'EOF'
+| Date | Project | Agent | Model | Task | Class | Risk | Plan Used | Approval | Files Inspected | Files Changed | Checks | Result | Context Notes | Harness Note |
+|---|---|---|---|---|---|---|---|---|---:|---:|---|---|---|---|
+EOF
+fi
+
+echo "| $DATE | $PROJECT | manual | n/a | $TASK | unknown | unknown | unknown | unknown | 0 | 0 | n/a | recorded | n/a | n/a |" >> "$LOG_FILE"
+echo "Logged to $LOG_FILE"

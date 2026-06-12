@@ -1,0 +1,21 @@
+# Copy to ~/.ai-harness/tools.local.yaml and edit locally.
+# Do not commit real machine-specific private paths.
+
+agents:
+  claude:
+    command: claude
+  codex:
+    command: codex
+    model: gpt-5.5
+    reasoning_effort: xhigh
+  agy:
+    command: agy
+  caveman:
+    command: caveman
+  context_mode:
+    command: ctx
+
+preferences:
+  default_agent: claude
+  complex_planner: improve
+  log_trivial_tasks: false

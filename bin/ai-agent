@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DRY_RUN=0
+if [[ "${1:-}" == "--dry-run" ]]; then
+  DRY_RUN=1
+  shift
+fi
+
+AGENT="${1:-}"
+shift || true
+
+if [[ -z "$AGENT" ]]; then
+  echo "Usage: ai-agent [--dry-run] <claude|codex|agy|caveman|generic> \"task\"" >&2
+  exit 1
+fi
+
+TASK="$*"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+HARNESS_HOME="${AI_HARNESS_HOME:-$HOME/.ai-harness}"
+PROTOCOL="$HARNESS_HOME/GLOBAL_AGENT_PROTOCOL.md"
+BOOT="$HARNESS_HOME/BOOTSTRAP_PROMPT.md"
+
+PROJECT_HINTS=""
+[[ -f "$ROOT/AGENTS.md" ]] && PROJECT_HINTS="$PROJECT_HINTS
+- Project contract: $ROOT/AGENTS.md"
+[[ -f "$ROOT/CLAUDE.md" ]] && PROJECT_HINTS="$PROJECT_HINTS
+- Claude project file: $ROOT/CLAUDE.md"
+[[ -f "$ROOT/docs/harness/README.md" ]] && PROJECT_HINTS="$PROJECT_HINTS
+- Project harness docs: $ROOT/docs/harness/README.md"
+[[ -d "$ROOT/.claude/rules" ]] && PROJECT_HINTS="$PROJECT_HINTS
+- Project rules: $ROOT/.claude/rules"
+
+PROMPT="$(cat <<EOF
+Follow the global AI harness protocol.
+
+Global files:
+- $PROTOCOL
+- $BOOT
+
+Project root: $ROOT
+
+Project harness discovered:
+$PROJECT_HINTS
+
+User task:
+$TASK
+
+Start by classifying the task, choosing context budget, and stating whether plan/approval is required.
+Do not scan the whole repository by default.
+EOF
+)"
+
+if [[ "$DRY_RUN" == "1" ]]; then
+  echo "ai-agent dry-run"
+  echo "Agent: $AGENT"
+  echo "Project root: $ROOT"
+  echo "Protocol: $PROTOCOL"
+  echo "Bootstrap: $BOOT"
+  echo "Project hints:$PROJECT_HINTS"
+  echo
+  echo "$PROMPT"
+  exit 0
+fi
+
+case "$AGENT" in
+  claude)
+    claude "$PROMPT"
+    ;;
+  codex)
+    codex exec -m "${CODEX_MODEL:-gpt-5.5}" -c reasoning.effort="${CODEX_REASONING_EFFORT:-xhigh}" -C "$ROOT" "$PROMPT" < /dev/null
+    ;;
+  agy|antigravity)
+    agy -p "$PROMPT"
+    ;;
+  caveman)
+    caveman "$PROMPT"
+    ;;
+  generic)
+    echo "$PROMPT"
+    ;;
+  *)
+    echo "Unknown agent: $AGENT" >&2
+    exit 1
+    ;;
+esac

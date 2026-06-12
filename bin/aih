@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+KIT_DIR="${AI_HARNESS_KIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+INSTALL_DIR="${AI_HARNESS_HOME:-$HOME/.ai-harness}"
+VERSION="0.1.0"
+
+cmd="${1:-help}"
+shift || true
+
+usage() {
+  cat <<EOF
+aih $VERSION
+
+Commands:
+  doctor
+  install
+  init-project [--dry-run]
+  sync-project [--dry-run]
+  log "task"
+  version
+  help
+EOF
+}
+
+case "$cmd" in
+  version)
+    echo "$VERSION"
+    ;;
+  doctor)
+    bash "$KIT_DIR/scripts/doctor.sh" "$@"
+    ;;
+  install)
+    bash "$KIT_DIR/scripts/install.sh" "$@"
+    ;;
+  init-project)
+    bash "$KIT_DIR/scripts/init-project.sh" "$@"
+    ;;
+  sync-project)
+    bash "$KIT_DIR/scripts/sync-project.sh" "$@"
+    ;;
+  log)
+    "$KIT_DIR/bin/ai-task-log" "$@"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    usage
+    exit 1
+    ;;
+esac

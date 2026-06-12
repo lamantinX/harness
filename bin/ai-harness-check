@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "AI Harness check"
+echo "Home: ${AI_HARNESS_HOME:-$HOME/.ai-harness}"
+echo "Kit: ${AI_HARNESS_KIT_DIR:-unknown}"
+
+for cmd in git bash claude codex agy caveman ctx gh; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    echo "found: $cmd ($(command -v "$cmd"))"
+  else
+    echo "missing: $cmd"
+  fi
+done

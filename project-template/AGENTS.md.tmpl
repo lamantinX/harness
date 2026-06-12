@@ -1,0 +1,49 @@
+# AGENTS.md — {{PROJECT_NAME}}
+
+This is the project-level cross-agent contract.
+
+## Project
+
+- Name: {{PROJECT_NAME}}
+- Stack: {{STACK}}
+
+## Default workflow
+
+1. Classify task.
+2. Load the smallest relevant context.
+3. Make the smallest safe change.
+4. Run targeted verification.
+5. Log meaningful runs.
+
+## Task classes
+
+- Trivial
+- Standard
+- Complex
+- Core-risk
+- Research-only
+- Meta-harness improvement
+
+## Critical areas
+
+{{CRITICAL_AREAS}}
+
+## Test commands
+
+{{TEST_COMMANDS}}
+
+## Branch/deploy policy
+
+- Default branch: {{DEFAULT_BRANCH}}
+- Staging branch: {{STAGING_BRANCH}}
+- Deploy policy: {{DEPLOY_POLICY}}
+
+## Safety
+
+Do not touch secrets, environment files, production data, destructive operations, or production deploy logic without explicit approval.
+
+## Local harness
+
+Read project rules under `.claude/rules/` when relevant.
+Use `docs/harness/README.md` for project harness details.
+Log meaningful runs under `docs/ai-runs/`.
